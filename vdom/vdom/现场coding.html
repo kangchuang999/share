@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>vdom</title>
+</head>
+<body>
+<div id="vdom"></div>
+</body>
+<script type="text/javascript">
+	function setAttr (node, key, value) {
+	  switch (key) {
+	    case 'style':
+	      node.style.cssText = value
+	      break
+	    case 'value':
+	      var tagName = node.tagName || ''
+	      tagName = tagName.toLowerCase()
+	      if (
+	        tagName === 'input' || tagName === 'textarea'
+	      ) {
+	        node.value = value
+	      } else {
+	        // if it is not a input or textarea, use `setAttribute` to set
+	        node.setAttribute(key, value)
+	      }
+	      break
+	    default:
+	      node.setAttribute(key, value)
+	      break
+	  }
+	}
+	/**
+	 * js 对象表示 dom结构
+	 */
+	function Element(tagName, props, children) {
+		if (!(this instanceof Element)) {
+			return new Element(tagName, props, children);
+		}
+		return Object.assign(this, {tagName, props, children})
+	}
+	/**
+	 * 如何讲element 对象渲染成真实 DOM
+	 * 
+	 */
+	function  render (element) {
+		var node = document.createElement(element.tagName);
+
+		for (var i in element.props) {
+			setAttr(node , i, element.props[i])
+		}
+
+		if(element.children) {
+			if (!(element.children instanceof Array)) {
+				element.children = [element.children];
+			}
+			element.children.forEach(function(child){
+				var chillNode = child instanceof Element ? render(child) : document.createTextNode(child)	
+				node.appendChild(chillNode)
+			})
+		}
+		return node;
+	}
+	//----------------------------
+	var el = Element;
+	var tree = el('div', {id: 'wrap'},[
+			el('h1', {}, ['hello vdom']),
+			el('ul', {}, [
+				el('li', {}, "1"),
+				el('li', {}, "2"),
+				]),
+		]);
+	var node = render(tree);
+	document.getElementById('vdom').appendChild(node);
+</script>
+</html>

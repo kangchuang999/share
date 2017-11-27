@@ -1,0 +1,49 @@
+<html>
+<head>
+    <title>vdom demo</title>
+    <script src="vendor/utils.js"></script>
+    <script src="lib/list-diff.js"></script>
+    <script src="lib/vdom.js"></script>
+</head>
+<body>
+    <section id="main"></section>
+    <button id="change" onclick="changeDom()">改变dom</button>
+</body>
+<script type="text/javascript">
+
+	var el = vdom.element;
+	var diff = vdom.diff;
+	var patch = vdom.patch;
+
+	var tree = el('div', {'id': 'container'}, 
+					[
+						el('h1', {style: 'color: blue'}, ['simple virtal dom']),
+						el('p', ['Hello, virtual-dom']),
+						el('ul',[
+									el('li', {}, "1"),
+									el('li', {}, '2'),
+									el('li', {}, '3')
+								])
+					]
+			    );
+	// console.log(JSON.stringify(tree))
+	var realDom = tree.render()
+	document.getElementById('main').appendChild(realDom)
+
+	function changeDom(){
+		var newTree = el('div', {'id': 'container'},
+							[
+								el('h1', {style: 'color: red'},
+										['simple virtal dom']),
+								el('p', ['Hello, virtual-dom']),
+								el('ul', [
+											el('li', null, 312321),
+											el('li', null, 2134324)
+										])
+							])
+
+		var patches = diff(tree, newTree)
+		patch(realDom, patches)
+	}
+</script>
+</html>

@@ -1,0 +1,39 @@
+<html>
+<head>
+    <title>Vue demo</title>
+    <link rel="stylesheet" href="style/style.css">
+    <script src="node_modules/vue.js"></script>
+</head>
+<body>
+	<section id="demoapp">
+		<header id="header">
+			<h1>Vue</h1>
+			<form id="demo-form">
+				<input id="new-demo" type="text" v-model="yourName" autofocus>
+			</form>
+		</header>
+		<section id="main">
+			<ul id="demo-list">
+				<li>
+					<label @click="getName">Hello, {{yourName}}</label>
+					<!-- {{getName()}} -->
+				</li>
+			</ul>
+		</section>
+    </section>
+</body>
+<script type="text/javascript">
+    // 这里是 JS 代码
+    new Vue({
+        el: '#demoapp',
+        data: {
+            yourName: 'world'
+        },
+        methods: {
+            getName: function () {
+                return this.yourName += '1';
+            }
+        }
+    });
+</script>
+</html>

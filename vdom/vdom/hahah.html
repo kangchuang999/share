@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>vdom</title>
+</head>
+<body>
+	<div id="demo"></div>
+</body>
+<script type="text/javascript">
+	function setAttr (node, key, value) {
+	  switch (key) {
+	    case 'style':
+	      node.style.cssText = value
+	      break
+	    case 'value':
+	      var tagName = node.tagName || ''
+	      tagName = tagName.toLowerCase()
+	      if (
+	        tagName === 'input' || tagName === 'textarea'
+	      ) {
+	        node.value = value
+	      } else {
+	        // if it is not a input or textarea, use `setAttribute` to set
+	        node.setAttribute(key, value)
+	      }
+	      break
+	    default:
+	      node.setAttribute(key, value)
+	      break
+	  }
+	}
+	/**
+	 * 写一个表示界面节点的对象
+	 */
+	function Element(tagName, props, children) {
+		if(!(this instanceof Element)) {
+			return new Element(tagName, props, children);
+		}
+		return Object.assign(this, {tagName, props, children})
+	}
+	/**
+	 * 将 Element 对象渲染成 DOM
+	 */
+	function render (element){
+		var node = document.createElement(element.tagName);
+
+		for (var i in element.props) {
+			setAttr(node, i, element.props[i])
+		}
+
+		//children ,可能为 null,
+		//          不为 null, 1. 直接一个元素； 2. 一堆元素
+		if(element.children){
+			if (!(element.children instanceof Array)) {
+				element.children = [element.children]
+			}
+			element.children.forEach(function(child){
+				var childNode = child instanceof Element
+									? render(child)
+									: document.createTextNode(child);
+				node.appendChild(childNode)	
+			});
+		}
+		return node;
+	}
+	/*********************************************/
+	var  el = Element;
+	var tree = el('div', {id: 'wrap'}, [
+			el('h1', {style: 'color: blue'}, ['vdom demo']),
+			el('p', {}, 'hello, vdom'),
+			el('ul', {}, [
+				el('li', {}, '1'),
+				el('li', {}, '2'),
+				el('li', {}, '3')
+				]),
+		]);
+	// console.log(JSON.stringify(tree))
+	var realDom = render(tree)
+	document.getElementById('demo').appendChild(realDom)
+</script>
+</html>
